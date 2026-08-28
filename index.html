@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>6×6 Go</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <header>
+      <h1>6×6 Go</h1>
+      <p class="sub">Six lines by six intersections. Black first. Chinese score, no komi.</p>
+    </header>
+
+    <div class="layout">
+      <aside class="panel">
+        <div id="turn" class="turn">Black to play</div>
+        <div class="caps">
+          <div>Black took <span id="cap-b">0</span></div>
+          <div>White took <span id="cap-w">0</span></div>
+        </div>
+        <div id="score" class="score hidden"></div>
+
+        <div class="players">
+          <label class="row">Black
+            <select id="black-player">
+              <option value="human">Human</option>
+              <option value="machine">Machine</option>
+            </select>
+          </label>
+          <label class="row">White
+            <select id="white-player">
+              <option value="human">Human</option>
+              <option value="machine">Machine</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="selfplay">
+          <div class="row">
+            <span>Self-play</span>
+            <button id="btn-run" type="button">Start</button>
+          </div>
+          <label class="row">Speed
+            <span>
+              <input id="speed" type="range" min="400" max="1800" step="100" value="900">
+              <span id="speed-val">0.9s</span>
+            </span>
+          </label>
+        </div>
+
+        <div class="actions">
+          <button id="btn-pass" type="button">Pass</button>
+          <button id="btn-new" type="button">New game</button>
+        </div>
+        <p class="hint">
+          Click an empty point. Suicide is illegal unless it captures.
+          Simple ko. Two passes end the game. A1 is bottom-left, F6 is top-right.
+        </p>
+      </aside>
+
+      <div class="board-wrap">
+        <canvas id="board" width="640" height="640"></canvas>
+      </div>
+
+      <aside class="panel">
+        <h2>Commentary</h2>
+        <p id="last-comment" class="comment">Click an empty point to play.</p>
+        <ol id="log"></ol>
+
+        <h2>Learning stats</h2>
+        <p class="stats-line">Games <span id="stat-games">0</span></p>
+        <p class="stats-line" id="stat-split">Black 0 · White 0 · Even 0</p>
+        <p class="stats-line">Average stones captured <span id="stat-caps">—</span></p>
+        <p class="stats-line" id="stat-first">No finished self-play games yet.</p>
+        <canvas id="heat" width="264" height="264"></canvas>
+        <button id="btn-reset-stats" class="ghost" type="button">Reset stats</button>
+        <p class="hint">
+          Heat is the learned weight of each point. Warmer means the machine
+          has been winning more often after playing there. Stored only in this
+          browser as <code>go6x6.stats.v1</code>.
+        </p>
+      </aside>
+    </div>
+  </div>
+  <script src="rules.js"></script>
+  <script src="go.js"></script>
+</body>
+</html>
