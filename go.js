@@ -229,8 +229,8 @@
       job === "filling a last liberty" ||
       job === "saving a one-liberty group" ||
       job === "connecting";
-    if (!useful && history.length >= 16) return { pass: true };
-    if (!useful && history.length >= 8 && bestS < 2.6) return { pass: true };
+    if (!useful && history.length >= 20) return { pass: true };
+    if (!useful && history.length >= 14 && bestS < 1.8) return { pass: true };
     return { pass: false, move: best };
   }
 
@@ -301,7 +301,7 @@
       timer = setTimeout(() => {
         if (!running) return;
         resetGame();
-      }, Math.max(700, speedMs()));
+      }, Math.max(2800, speedMs() * 2));
     }
   }
 
