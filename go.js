@@ -326,19 +326,54 @@
     return [m + x * step, m + y * step];
   }
 
-  function pixToXy(px, py) {
+  function canvasLocal(e) {
     const rect = canvas.getBoundingClientRect();
     const sx = canvas.width / rect.width;
     const sy = canvas.height / rect.height;
-    const x = (px - rect.left) * sx;
-    const y = (py - rect.top) * sy;
+    if (typeof e.offsetX === "number" && e.target === canvas) {
+      return [e.offsetX * sx, e.offsetY * sy];
+    }
+    return [(e.clientX - rect.left) * sx, (e.clientY - rect.top) * sy];
+  }
+
+  function pixToXy(px, py) {
     const { m, step } = pad();
-    const gx = Math.round((x - m) / step);
-    const gy = Math.round((y - m) / step);
+    const gx = Math.round((px - m) / step);
+    const gy = Math.round((py - m) / step);
     if (!inb(gx, gy)) return null;
     const [ax, ay] = xyToPix(gx, gy);
-    if (Math.hypot(ax - x, ay - y) > step * 0.42) return null;
+    if (Math.hypot(ax - px, ay - py) > step * 0.42) return null;
     return [gx, gy];
+  }
+
+  function buildHits() {
+    const el = document.getElementById("hits");
+    el.innerHTML = "";
+    const m = 13;
+    const step = 74 / (N - 1);
+    for (let y = 0; y < N; y++) {
+      for (let x = 0; x < N; x++) {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "hit";
+        btn.setAttribute("aria-label", pointName(x, y));
+        btn.style.left = m + x * step + "%";
+        btn.style.top = m + y * step + "%";
+        btn.addEventListener("pointerenter", () => {
+          hover = [x, y];
+          draw();
+        });
+        btn.addEventListener("pointerleave", () => {
+          hover = null;
+          draw();
+        });
+        btn.addEventListener("click", () => {
+          if (!humanMayAct()) return;
+          tryPlay(x, y);
+        });
+        el.appendChild(btn);
+      }
+    }
   }
 
   function drawStone(x, y, color, alpha) {
@@ -495,7 +530,8 @@
   }
 
   canvas.addEventListener("pointermove", (e) => {
-    hover = pixToXy(e.clientX, e.clientY);
+    const [lx, ly] = canvasLocal(e);
+    hover = pixToXy(lx, ly);
     draw();
   });
   canvas.addEventListener("pointerleave", () => {
@@ -504,7 +540,8 @@
   });
   canvas.addEventListener("click", (e) => {
     if (!humanMayAct()) return;
-    const pt = pixToXy(e.clientX, e.clientY);
+    const [lx, ly] = canvasLocal(e);
+    const pt = pixToXy(lx, ly);
     if (!pt) return;
     tryPlay(pt[0], pt[1]);
   });
@@ -560,6 +597,7 @@
     loadStats,
   };
 
+  buildHits();
   resetGame();
   renderStats();
 })();
